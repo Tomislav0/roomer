@@ -1,5 +1,6 @@
 package com.tomislav0.roomer.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,14 +27,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.tomislav0.roomer.models.Response
+import com.tomislav0.roomer.viewModels.ForgotPasswordViewModel
+import com.tomislav0.roomer.viewModels.RegisterViewModel
 
 @ExperimentalMaterial3Api
 @Composable
-fun ForgotPasswordScreen(navController: NavController, scrollState: ScrollState) {
-
+fun ForgotPasswordScreen(
+    navController: NavController,
+    scrollState: ScrollState,
+    viewModel: ForgotPasswordViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
 
     Surface(
@@ -62,7 +72,17 @@ fun ForgotPasswordScreen(navController: NavController, scrollState: ScrollState)
             Spacer(modifier = Modifier.size(20.dp))
 
             Button(
-                onClick = { /* Perform login */ },
+                onClick = {
+                    viewModel.sendPasswordResetEmail(email).invokeOnCompletion {
+                        if (viewModel.sendPasswordResetEmailResponse == Response.Success(true)) {
+                            Toast.makeText(context, "Success. Please check email.", Toast.LENGTH_SHORT)
+                                .show()
+                            navController.navigate("login")
+                        } else {
+                            Toast.makeText(context, "Wrong email.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()

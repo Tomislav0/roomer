@@ -87,10 +87,10 @@ fun RoomsScreen(navController: NavController, scrollState: ScrollState) {
                         .clip(shape = RoundedCornerShape(15.dp))
                         .background(color = Color(0xFF304430))
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 15.dp)
                         .clickable {
                             navController.navigate("room/${item.id}")
-                        },
+                        }
+                        .padding(horizontal = 10.dp, vertical = 15.dp),
                 ) {
                     Column() {
                         Text(text = item.name, fontSize = 30.sp)

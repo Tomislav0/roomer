@@ -49,17 +49,17 @@ fun RoomUpsertScreen(navController: NavController, scrollState: ScrollState, id:
         mutableStateOf<List<User>>(
             mutableListOf(
                 User(
-                    id = 1,
+                    id = "1",
                     name = "Tomislav",
                     surname = "Kovacevic",
                     initials = "TK",
                     gender = "m"
                 ),
-                User(id = 2, name = "Marko", surname = "Kuralic", initials = "MK", gender = "m"),
-                User(id = 3, name = "Luka", surname = "Mirkovic", initials = "LM", gender = "m"),
-                User(id = 4, name = "Miroljub", surname = "Sabo", initials = "MS", gender = "m"),
-                User(id = 5, name = "Rutko", surname = "Mrilc", initials = "RM", gender = "m"),
-                User(id = 6, name = "Zvrk", surname = "Zuzo", initials = "ZZ", gender = "m")
+                User(id = "2", name = "Marko", surname = "Kuralic", initials = "MK", gender = "m"),
+                User(id = "3", name = "Luka", surname = "Mirkovic", initials = "LM", gender = "m"),
+                User(id = "4", name = "Miroljub", surname = "Sabo", initials = "MS", gender = "m"),
+                User(id = "5", name = "Rutko", surname = "Mrilc", initials = "RM", gender = "m"),
+                User(id = "6", name = "Zvrk", surname = "Zuzo", initials = "ZZ", gender = "m")
             )
         )
     }

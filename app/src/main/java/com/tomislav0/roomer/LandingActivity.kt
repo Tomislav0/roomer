@@ -28,81 +28,56 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.common.api.Response
 import com.google.firebase.auth.FirebaseAuth
+import com.tomislav0.roomer.dataAccess.StoreData
 import com.tomislav0.roomer.screens.auth.ForgotPasswordScreen
 import com.tomislav0.roomer.screens.auth.LoginScreen
 import com.tomislav0.roomer.screens.auth.RegistrationScreen
 import com.tomislav0.roomer.ui.theme.RoomerTheme
+import com.tomislav0.roomer.viewModels.LoginViewModel
 import com.tomislav0.roomer.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class LandingActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RoomerTheme {
-                val navController = rememberNavController()
-                val imeState = rememberImeState()
-                val scrollState = rememberScrollState()
-
-                LaunchedEffect(key1 = imeState.value) {
-                    if (imeState.value) {
-                        scrollState.animateScrollTo(scrollState.value, tween(300))
-                    }
-                }
-
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-
-                ) {
-
-                    NavHost(navController, startDestination = "login") {
-                        composable("login") {
-                            LoginScreen(navController, scrollState)
-                        }
-                        composable("registration") {
-                            RegistrationScreen(navController, scrollState)
-                        }
-
-                        composable("forgot_password") {
-                            ForgotPasswordScreen(navController, scrollState)
-                        }
-
-                    }
-                }
-            }
+            InitalCheck()
         }
     }
+}
 
-    @Composable
-    private fun AuthState(navController: NavController) {
-        var context = LocalContext.current
+@Composable
+private fun InitalCheck(viewModel: LoginViewModel = hiltViewModel()) {
 
-        val isUserSignedOut = viewModel.getAuthState().collectAsState().value
+    val context = LocalContext.current
+    val data = StoreData(context)
 
-        if (isUserSignedOut) {
+    var auth = FirebaseAuth.getInstance()
 
-            navController.navigate("login")
-        } else {
-            Log.v("Debug",FirebaseAuth.getInstance().uid!!)
-            context.startActivity(
-                Intent(
-                    context,
-                    ContentActivity::class.java
-                )
-            )
-        }
+    if (auth.currentUser != null) {
+        Log.v("Debug2", auth.currentUser!!.uid!!)
+        val i = Intent(context, ContentActivity::class.java)
+        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        context.startActivity(i)
+    } else {
+        val i = Intent(context, MainActivity::class.java)
+        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        context.startActivity(i)
     }
 }
 

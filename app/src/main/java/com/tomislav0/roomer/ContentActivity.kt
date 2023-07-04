@@ -1,9 +1,10 @@
 package com.tomislav0.roomer
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,37 +13,35 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import coil.imageLoader
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import com.tomislav0.roomer.models.MenuItem
 import com.tomislav0.roomer.screens.rooms.RoomOverviewScreen
 import com.tomislav0.roomer.screens.rooms.RoomUpsertScreen
@@ -58,7 +57,7 @@ class ContentActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val imeState = rememberImeState()
                 val scrollState = rememberScrollState()
-
+                val context = LocalContext.current
                 LaunchedEffect(key1 = imeState.value) {
                     if (imeState.value) {
                         scrollState.animateScrollTo(scrollState.value, tween(300))
@@ -84,7 +83,12 @@ class ContentActivity : ComponentActivity() {
                                 DrawerBody(
                                     items = getMenuItems(),
                                     onItemClick = {
-                                        println("Clicked on ${it.title}")
+                                        when(it.id){
+                                            "logout" -> {
+                                                FirebaseAuth.getInstance().signOut()
+                                                context.startActivity(Intent(context, MainActivity::class.java))
+                                            }
+                                        }
                                     })
                             }
 
@@ -173,19 +177,19 @@ fun getMenuItems(): List<MenuItem> {
             id = "tasks",
             title = "Tasks",
             contentDescription = "Go to tasks screen",
-            icon = Icons.Default.Home
+            icon = Icons.Default.Check
         ),
         MenuItem(
             id = "connections",
             title = "Connections",
             contentDescription = "Go to connections screen",
-            icon = Icons.Default.Home
+            icon = Icons.Default.Person
         ),
         MenuItem(
-            id = "settings",
-            title = "Settings",
-            contentDescription = "Go to settings screen",
-            icon = Icons.Default.Home
+            id = "logout",
+            title = "Logout",
+            contentDescription = "Go to Logout screen",
+            icon = Icons.Default.ArrowBack
         )
     )
 }

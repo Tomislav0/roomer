@@ -1,5 +1,8 @@
 package com.tomislav0.roomer.screens.auth
 
+import android.content.Intent
+import android.provider.ContactsContract.CommonDataKinds.Email
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -38,11 +41,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import ch.benlu.composeform.validators.EmailValidator
+import com.google.firebase.auth.FirebaseAuth
+import com.tomislav0.roomer.ContentActivity
+import com.tomislav0.roomer.models.Response
+import com.tomislav0.roomer.models.User
+import com.tomislav0.roomer.viewModels.LoginViewModel
+import com.tomislav0.roomer.viewModels.RegisterViewModel
+import com.tomislav0.roomer.viewModels.UserViewModel
 
 @ExperimentalMaterial3Api
 @Composable
-fun RegistrationScreen(navController: NavController, scrollState: ScrollState) {
+fun RegistrationScreen(navController: NavController, scrollState: ScrollState, viewModel: RegisterViewModel = hiltViewModel(), userViewModel: UserViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val genders = arrayOf("Male", "Female", "Prefer not to say")
 
@@ -122,15 +134,6 @@ fun RegistrationScreen(navController: NavController, scrollState: ScrollState) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = "Email") },
-                singleLine = true,
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = {
@@ -172,7 +175,30 @@ fun RegistrationScreen(navController: NavController, scrollState: ScrollState) {
             Spacer(modifier = Modifier.size(20.dp))
 
             Button(
-                onClick = { /* Perform login */ },
+                onClick = {
+                    if(email == "" || password == "" || repeatPassword == "" || name == "" || surname == "" || gender == "") {
+                        Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }else if(!EmailValidator().validate(email)){
+                        Toast.makeText(context, "Invalid email", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    } else if(password.length < 6){
+                        Toast.makeText(context, "Password must contain at least 6 characters.", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    } else if(password != repeatPassword){
+                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    viewModel.signUpWithEmailAndPassword(email, password).invokeOnCompletion {
+                        if((viewModel.signUpResponse as Response.Success).data.length == 28){
+                            userViewModel.addUser(User((viewModel.signUpResponse as Response.Success).data,name,surname,"${name.first()}${surname.first()}",gender))
+                            Toast.makeText(context, "Success. Please login.", Toast.LENGTH_SHORT).show()
+                            navController.navigate("login")
+                        }else{
+                            Toast.makeText(context, "Wrong email or password.", Toast.LENGTH_SHORT).show()
+                        }
+                }},
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()

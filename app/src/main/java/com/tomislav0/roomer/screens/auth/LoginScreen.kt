@@ -1,6 +1,7 @@
 package com.tomislav0.roomer.screens.auth
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,15 +39,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.tomislav0.roomer.ContentActivity
 import com.tomislav0.roomer.R
+import com.tomislav0.roomer.dataAccess.StoreData
+import com.tomislav0.roomer.models.Response
+import com.tomislav0.roomer.viewModels.LoginViewModel
+import com.tomislav0.roomer.viewModels.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @Composable
-fun LoginScreen(navController: NavController, scrollState: ScrollState) {
+fun LoginScreen(navController: NavController, scrollState: ScrollState, viewModel: LoginViewModel = hiltViewModel()) {
     val emailState = remember { mutableStateOf(TextFieldValue()) }
     val passwordState = remember { mutableStateOf(TextFieldValue()) }
+    val db = Firebase.firestore
+    val auth = Firebase.auth
     val mContext = LocalContext.current
     Column(
         modifier = Modifier
@@ -108,8 +121,28 @@ fun LoginScreen(navController: NavController, scrollState: ScrollState) {
 
         Spacer(modifier = Modifier.size(20.dp))
 
+        val scope = rememberCoroutineScope()
         Button(
-            onClick = { mContext.startActivity(Intent(mContext, ContentActivity::class.java)) },
+            onClick = {
+                viewModel.signInWithEmailAndPassword(emailState.value.text, passwordState.value.text)
+                    .invokeOnCompletion {
+                            if(viewModel.signInResponse == Response.Success(true)){
+                                Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show()
+                                val dataStore = StoreData(mContext)
+
+                                scope.launch {
+                                    dataStore.saveData(emailState.value.text,passwordState.value.text)
+                                }
+
+
+                                val i = Intent(mContext, ContentActivity::class.java)
+                                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                mContext.startActivity(i)
+                            }else{
+                                Toast.makeText(mContext, "Wrong email or password.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                      },
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
