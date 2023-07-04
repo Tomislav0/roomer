@@ -3,6 +3,7 @@ package com.tomislav0.roomer.dataAccess
 import com.google.firebase.auth.FirebaseUser
 import com.tomislav0.roomer.models.Response
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 typealias SignUpResponse = Response<String>
@@ -15,7 +16,6 @@ typealias AuthStateResponse = StateFlow<Boolean>
 
 
 interface AuthRepository {
-    val currentUser: FirebaseUser?
 
     suspend fun firebaseSignUpWithEmailAndPassword(email: String, password: String): SignUpResponse
 
@@ -32,4 +32,6 @@ interface AuthRepository {
     suspend fun revokeAccess(): RevokeAccessResponse
 
     fun getAuthState(viewModelScope: CoroutineScope): AuthStateResponse
+
+    val currentUser: Flow<String?>
 }

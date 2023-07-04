@@ -1,8 +1,10 @@
 package com.tomislav0.roomer.dataAccess
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tomislav0.roomer.models.Response
+import com.tomislav0.roomer.models.Room
 import com.tomislav0.roomer.models.User
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -12,26 +14,16 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserRepositoryImpl @Inject constructor(
+class RoomRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore
-) : UserRepository {
-    override suspend fun addUser(user: User): AddUserResponse {
-        return try {
-            db.collection("users").document(user.id)
-                .set(user).await()
-            Response.Success(true)
+) : RoomRepository {
+
+    override suspend fun createRoom(room: Room) {
+        try {
+            db.collection("rooms").document(room.id).set(room).await()
         } catch (e: Exception) {
-            Response.Failure(e)
+            Log.v("Error",e.toString())
         }
     }
-
-    override suspend fun getAllUsers(): List<User> {
-        return try {
-            db.collection("users").get().await().documents as List<User>
-        } catch (e: Exception) {
-           listOf()
-        }
-    }
-
 }

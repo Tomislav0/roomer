@@ -43,12 +43,15 @@ import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.tomislav0.roomer.models.MenuItem
+import com.tomislav0.roomer.screens.rooms.AddTaskScreen
 import com.tomislav0.roomer.screens.rooms.RoomOverviewScreen
 import com.tomislav0.roomer.screens.rooms.RoomUpsertScreen
 import com.tomislav0.roomer.screens.rooms.RoomsScreen
 import com.tomislav0.roomer.ui.theme.RoomerTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ContentActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,10 +86,15 @@ class ContentActivity : ComponentActivity() {
                                 DrawerBody(
                                     items = getMenuItems(),
                                     onItemClick = {
-                                        when(it.id){
+                                        when (it.id) {
                                             "logout" -> {
                                                 FirebaseAuth.getInstance().signOut()
-                                                context.startActivity(Intent(context, MainActivity::class.java))
+                                                context.startActivity(
+                                                    Intent(
+                                                        context,
+                                                        MainActivity::class.java
+                                                    )
+                                                )
                                             }
                                         }
                                     })
@@ -101,12 +109,13 @@ class ContentActivity : ComponentActivity() {
                                     scope.launch {
                                         drawerState.open()
                                     }
-                                })
+                                }, navController = navController)
                             },
                             floatingActionButton = {
 
                                 // Access the current route
-                                val currentRoute: State<NavBackStackEntry?> = navController.currentBackStackEntryAsState()
+                                val currentRoute: State<NavBackStackEntry?> =
+                                    navController.currentBackStackEntryAsState()
 
                                 if (currentRoute.value?.destination?.route == "rooms") {
                                     FloatingActionButton(
@@ -127,7 +136,7 @@ class ContentActivity : ComponentActivity() {
 
                                 NavHost(navController, startDestination = "rooms") {
                                     composable("rooms") {
-                                        RoomsScreen(navController, scrollState)
+                                        RoomsScreen(navController)
                                     }
                                     composable(
                                         "room/{id}",
@@ -151,6 +160,18 @@ class ContentActivity : ComponentActivity() {
                                             navController,
                                             scrollState,
                                             backStackEntry.arguments?.getString("id")
+                                        )
+                                    }
+                                    composable(
+                                        "task/add/{roomId}",
+                                        arguments = listOf(navArgument("roomId") {
+                                            type = NavType.StringType
+                                        })
+                                    ) { backStackEntry ->
+                                        AddTaskScreen(
+                                            navController,
+                                            scrollState,
+                                            backStackEntry.arguments?.getString("roomId")
                                         )
                                     }
 

@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -31,9 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.tomislav0.roomer.models.Room
@@ -43,15 +46,8 @@ import com.tomislav0.roomer.viewModels.UserViewModel
 import kotlinx.coroutines.flow.first
 import java.util.UUID.randomUUID
 
-@ExperimentalMaterial3Api
 @Composable
-fun RoomUpsertScreen(
-    navController: NavController,
-    scrollState: ScrollState,
-    id: String?,
-    userViewModel: UserViewModel = hiltViewModel(),
-    roomsViewModel: RoomViewModel = hiltViewModel()
-) {
+fun AddTaskScreen(navController: NavController, scrollState: ScrollState, roomId: String?, userViewModel:UserViewModel = hiltViewModel(), roomsViewModel: RoomViewModel= hiltViewModel() ) {
     var members by remember {
         mutableStateOf<List<User>>(listOf())
     }
@@ -61,10 +57,17 @@ fun RoomUpsertScreen(
     var currentUser by remember {
         mutableStateOf<User>(User())
     }
+
+    var room by remember {
+        mutableStateOf(Room())
+    }
     LaunchedEffect(Unit) {
-        members = userViewModel.users.first()
-        shownMembers = userViewModel.users.first()
         currentUser = userViewModel.currentUser.first().first()
+        roomsViewModel.getRoom(roomId!!).invokeOnCompletion {
+            room = roomsViewModel.room.value!!
+            members = room.members!!
+            shownMembers = room.members!!
+        }
     }
     val context = LocalContext.current
     var name by remember { mutableStateOf("") }
@@ -78,15 +81,21 @@ fun RoomUpsertScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
+        Text(
+            text = "Add Task - ${room.name}",
+            modifier = Modifier.padding(top=30.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 30.sp
+        )
 
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text(text = "Name") },
+            label = { Text(text = "Task Name") },
             singleLine = true,
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Name") },
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Task Name") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp)
@@ -95,9 +104,9 @@ fun RoomUpsertScreen(
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
-            label = { Text(text = "Description") },
+            label = { Text(text = "Task Description") },
             singleLine = true,
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Description") },
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Task Description") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -110,7 +119,7 @@ fun RoomUpsertScreen(
         ) {
             OutlinedTextField(
                 value = member,
-                label = { Text(text = "Add members") },
+                label = { Text(text = "Assign To") },
                 onValueChange = { value ->
                     member = value
                     if (value.length == 0) {
@@ -224,9 +233,7 @@ fun RoomUpsertScreen(
             Text(text = "Create room")
         }
 
+
     }
+
 }
-
-
-
-

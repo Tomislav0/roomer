@@ -1,5 +1,6 @@
 package com.tomislav0.roomer.screens.rooms
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +30,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -40,14 +44,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.tomislav0.roomer.models.Room
+import com.tomislav0.roomer.models.User
+import com.tomislav0.roomer.viewModels.RoomViewModel
+import com.tomislav0.roomer.viewModels.UserViewModel
+import kotlinx.coroutines.flow.first
 
 @Composable
-fun RoomsScreen(navController: NavController, scrollState: ScrollState) {
-    var rooms = remember { mutableStateOf<List<Room>>(getRooms()) }
+fun RoomsScreen(
+    navController: NavController,
+    viewModel: RoomViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
+) {
+    var currentUser by remember {
+        mutableStateOf<User>(User())
+    }
+    var rooms by remember { mutableStateOf<List<Room>>(listOf()) }
+    LaunchedEffect(Unit) {
+        currentUser = userViewModel.currentUser.first().first()
+        viewModel.getRooms(currentUser).invokeOnCompletion {
+            rooms = viewModel.rooms.value
+        }
+
+    }
     val lazyListState = rememberLazyListState()
     val firstItemTranslationY by remember {
         derivedStateOf {
@@ -55,6 +79,7 @@ fun RoomsScreen(navController: NavController, scrollState: ScrollState) {
                 lazyListState.layoutInfo.visibleItemsInfo.isNotEmpty() &&
                         lazyListState.firstVisibleItemIndex == 0
                 -> lazyListState.firstVisibleItemScrollOffset * .8f
+
                 else -> 0f
             }
         }
@@ -81,16 +106,21 @@ fun RoomsScreen(navController: NavController, scrollState: ScrollState) {
                     onSearchTextChanged = { })
                 Spacer(modifier = Modifier.size(20.dp))
             }
-            items(rooms.value) { item ->
+            itemsIndexed(rooms) { index, item ->
                 Row(
                     modifier = Modifier
                         .clip(shape = RoundedCornerShape(15.dp))
-                        .background(color = Color(0xFF304430))
+                        .background(
+                            color = if (index % 2 == 0) Color(0x55539F52) else Color(
+                                0x95354285
+                            )
+                        )
                         .fillMaxWidth()
                         .clickable {
                             navController.navigate("room/${item.id}")
                         }
-                        .padding(horizontal = 10.dp, vertical = 15.dp),
+                        .padding(horizontal = 10.dp, vertical = 15.dp)
+                        .shadow(90.dp, shape = RoundedCornerShape(15.dp)),
                 ) {
                     Column() {
                         Text(text = item.name, fontSize = 30.sp)
@@ -98,15 +128,15 @@ fun RoomsScreen(navController: NavController, scrollState: ScrollState) {
                         Spacer(modifier = Modifier.size(10.dp))
                         Text(text = "1 task assigned to you", fontSize = 15.sp)
                     }
-                    Column() {
-                        Row() {
-                            for (it in listOf("TK", "GV", "FC")) {
-                                Text(text = it, fontSize = 18.sp)
-                                Spacer(modifier = Modifier.size(10.dp))
-                            }
+                        Column(modifier = Modifier.padding(top = 8.dp)) {
+                            Row() {
+                                for (it in item.members!!.map { it.initials }) {
+                                    Text(text = it, fontSize = 18.sp)
+                                    Spacer(modifier = Modifier.size(10.dp))
+                                }
 
+                            }
                         }
-                    }
                 }
                 Spacer(modifier = Modifier.size(12.dp))
             }
@@ -143,47 +173,6 @@ fun SearchOutlinedTextField(
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = Color.Blue,
             unfocusedBorderColor = Color.Gray
-        )
-    )
-}
-
-fun getRooms(): List<Room> {
-    return mutableListOf(
-        Room(
-            id = "1",
-            name = "first",
-            description = "firstDescription",
-            members = null
-        ),
-        Room(
-            id = "2",
-            name = "second",
-            description = "secondDescription",
-            members = null
-        ),
-        Room(
-            id = "3",
-            name = "third",
-            description = "thirdDescription",
-            members = null
-        ),
-        Room(
-            id = "4",
-            name = "first",
-            description = "firstDescription",
-            members = null
-        ),
-        Room(
-            id = "5",
-            name = "second",
-            description = "secondDescription",
-            members = null
-        ),
-        Room(
-            id = "6",
-            name = "third",
-            description = "thirdDescription",
-            members = null
         )
     )
 }

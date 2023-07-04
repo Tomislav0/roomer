@@ -192,7 +192,7 @@ fun RegistrationScreen(navController: NavController, scrollState: ScrollState, v
 
                     viewModel.signUpWithEmailAndPassword(email, password).invokeOnCompletion {
                         if((viewModel.signUpResponse as Response.Success).data.length == 28){
-                            userViewModel.addUser(User((viewModel.signUpResponse as Response.Success).data,name,surname,"${name.first()}${surname.first()}",gender))
+                            userViewModel.addUser(User((viewModel.signUpResponse as Response.Success).data,email,name,surname,"${name.first()}${surname.first()}",gender))
                             Toast.makeText(context, "Success. Please login.", Toast.LENGTH_SHORT).show()
                             navController.navigate("login")
                         }else{

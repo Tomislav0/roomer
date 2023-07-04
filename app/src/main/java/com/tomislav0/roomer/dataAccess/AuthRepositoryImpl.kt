@@ -2,6 +2,7 @@ package com.tomislav0.roomer.dataAccess
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.tomislav0.roomer.models.Response
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -11,6 +12,7 @@ import com.tomislav0.roomer.models.Response.Success
 import com.tomislav0.roomer.models.Response.Failure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
@@ -19,7 +21,6 @@ import kotlinx.coroutines.flow.stateIn
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : AuthRepository {
-    override val currentUser get() = auth.currentUser
 
     override suspend fun firebaseSignUpWithEmailAndPassword(
         email: String, password: String
@@ -91,4 +92,14 @@ class AuthRepositoryImpl @Inject constructor(
         }
         Log.v("Debug", auth.uid!!)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), auth.currentUser == null)
+
+    override val currentUser: Flow<String?>
+        get() = callbackFlow {
+            val listener =
+                FirebaseAuth.AuthStateListener { auth ->
+                    this.trySend(auth.currentUser?.let { it.uid } ?: null)
+                }
+            auth.addAuthStateListener(listener)
+            awaitClose { auth.removeAuthStateListener(listener) }
+        }
 }
