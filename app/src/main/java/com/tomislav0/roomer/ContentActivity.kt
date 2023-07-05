@@ -47,6 +47,7 @@ import com.tomislav0.roomer.screens.rooms.AddTaskScreen
 import com.tomislav0.roomer.screens.rooms.RoomOverviewScreen
 import com.tomislav0.roomer.screens.rooms.RoomUpsertScreen
 import com.tomislav0.roomer.screens.rooms.RoomsScreen
+import com.tomislav0.roomer.screens.rooms.TasksScreen
 import com.tomislav0.roomer.ui.theme.RoomerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ class ContentActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RoomerTheme {
+                val scope = rememberCoroutineScope()
                 val navController = rememberNavController()
                 val imeState = rememberImeState()
                 val scrollState = rememberScrollState()
@@ -96,13 +98,21 @@ class ContentActivity : ComponentActivity() {
                                                     )
                                                 )
                                             }
+                                            "rooms" ->{
+                                                navController.navigate("rooms")
+                                            }
+                                            "tasks" ->{
+                                                navController.navigate("tasks")
+                                            }
+                                        }
+                                        scope.launch {
+                                            drawerState.close()
                                         }
                                     })
                             }
 
                         }
                     ) {
-                        val scope = rememberCoroutineScope()
                         Scaffold(
                             topBar = {
                                 AppBar(onNavigationIconClick = {
@@ -172,6 +182,13 @@ class ContentActivity : ComponentActivity() {
                                             navController,
                                             scrollState,
                                             backStackEntry.arguments?.getString("roomId")
+                                        )
+                                    }
+                                    composable(
+                                        "tasks"
+                                    ) {
+                                        TasksScreen(
+                                            navController,
                                         )
                                     }
 

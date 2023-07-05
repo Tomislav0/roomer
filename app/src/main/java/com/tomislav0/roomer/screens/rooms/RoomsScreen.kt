@@ -6,6 +6,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -119,24 +121,31 @@ fun RoomsScreen(
                         .clickable {
                             navController.navigate("room/${item.id}")
                         }
-                        .padding(horizontal = 10.dp, vertical = 15.dp)
+                        .padding(horizontal = 10.dp, vertical = 10.dp)
                         .shadow(90.dp, shape = RoundedCornerShape(15.dp)),
                 ) {
-                    Column() {
+                    Column(modifier = Modifier.weight(1f).padding(5.dp)) {
                         Text(text = item.name, fontSize = 30.sp)
                         Text(text = item.description, fontSize = 18.sp)
                         Spacer(modifier = Modifier.size(10.dp))
-                        Text(text = "1 task assigned to you", fontSize = 15.sp)
-                    }
-                        Column(modifier = Modifier.padding(top = 8.dp)) {
-                            Row() {
-                                for (it in item.members!!.map { it.initials }) {
-                                    Text(text = it, fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.size(10.dp))
-                                }
-
-                            }
+                        val assigned = item.tasks.filter {
+                            it.assignedTo.contains(currentUser) && !it.isDone
                         }
+                        Text(
+                            text = if (assigned.size != 0) if (assigned.size == 1) "${assigned.size} task assigned to you" else "${assigned.size} tasks assigned to you" else "No tasks assigned to you",
+                            fontSize = 15.sp
+                        )
+                    }
+                    Column(modifier = Modifier.padding(top = 18.dp, end = 5.dp)) {
+                        Row(modifier = Modifier.align(Alignment.End)) {
+                            for (it in item.members!!.map { it.initials }) {
+
+                                Spacer(modifier = Modifier.size(10.dp))
+                                Text(text = it, fontSize = 18.sp, textAlign = TextAlign.End)
+                            }
+
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.size(12.dp))
             }

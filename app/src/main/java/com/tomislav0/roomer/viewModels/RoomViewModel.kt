@@ -12,6 +12,7 @@ import com.google.firebase.firestore.ktx.toObject
 import com.tomislav0.roomer.dataAccess.AuthRepository
 import com.tomislav0.roomer.models.Response
 import com.tomislav0.roomer.models.Room
+import com.tomislav0.roomer.models.Task
 import com.tomislav0.roomer.models.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +30,6 @@ class RoomViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun createRoom(room: Room) = viewModelScope.launch {
-        Log.v("Debug", "CreateRoom")
         FirebaseFirestore.getInstance().collection("rooms").document(room.id).set(room).await()
     }
 
@@ -43,6 +43,16 @@ class RoomViewModel @Inject constructor(
 
     fun getRoom(id:String) = viewModelScope.launch {
         room.value = FirebaseFirestore.getInstance().collection("rooms").document(id).get().await().toObject<Room>()
-
     }
+
+    fun createTask(roomId: String, task: Task) = viewModelScope.launch {
+        Log.v("Debug", "CreateRoom")
+        val room = FirebaseFirestore.getInstance().collection("rooms").document(roomId).get().await().toObject<Room>()
+        room!!
+        val nRoom = Room(room.id,room.name,room.description,room.members, room.tasks + listOf(task))
+        FirebaseFirestore.getInstance().collection("rooms").document(roomId).set(nRoom).await()
+    }
+
+
+
 }

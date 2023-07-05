@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.tomislav0.roomer.models.Room
@@ -80,16 +85,26 @@ fun RoomUpsertScreen(
             .padding(horizontal = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row() {
+            Text(
+                text = "Create Room",
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = 10.dp),
+                textAlign = TextAlign.Start,
+                fontSize = 30.sp
+            )
+        }
 
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text(text = "Name") },
             singleLine = true,
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Name") },
+            leadingIcon = { Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Name") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 10.dp)
         )
 
         OutlinedTextField(
@@ -97,7 +112,12 @@ fun RoomUpsertScreen(
             onValueChange = { description = it },
             label = { Text(text = "Description") },
             singleLine = true,
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Description") },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Description"
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -169,11 +189,9 @@ fun RoomUpsertScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.size(20.dp))
-
         LazyColumn(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(top = 20.dp)
                 .weight(1f)
         ) {
             items(selectedMembers) { item ->
@@ -200,29 +218,29 @@ fun RoomUpsertScreen(
 
             }
         }
+            Button(
+                onClick = {
+                    selectedMembers.add(currentUser)
+                    roomsViewModel.createRoom(
+                        Room(
+                            randomUUID().toString(),
+                            name,
+                            description,
+                            selectedMembers
+                        )
+                    ).invokeOnCompletion {
+                        Toast.makeText(context, "Successful created", Toast.LENGTH_SHORT).show()
+                        navController.navigate("rooms")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 50.dp)
 
-        Button(
-            onClick = {
-                selectedMembers.add(currentUser)
-                roomsViewModel.createRoom(
-                    Room(
-                        randomUUID().toString(),
-                        name,
-                        description,
-                        selectedMembers
-                    )
-                ).invokeOnCompletion {
-                    Toast.makeText(context, "Successful created", Toast.LENGTH_SHORT).show()
-                    navController.navigate("rooms")
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 50.dp)
+            ) {
+                Text(text = "Create room")
+            }
 
-        ) {
-            Text(text = "Create room")
-        }
 
     }
 }

@@ -26,7 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 @Composable
 fun AppBar(
     onNavigationIconClick: () -> Unit,
-    navController:NavController
+    navController: NavController
 ) {
     TopAppBar(
         title = {
@@ -35,23 +35,14 @@ fun AppBar(
                     .fillMaxWidth()
                     .padding(end = 45.dp)
             ) {
-                val currentRoute: State<NavBackStackEntry?> = navController.currentBackStackEntryAsState()
-                Log.v("Debug", currentRoute.value?.destination?.route.toString())
-
-                when (currentRoute.value?.destination?.route) {
-                    "room/upsert/{id}" -> Text(text = "Create room",  modifier = Modifier
-                        .align(Alignment.Center))
-                    else ->
-                        Image(
-                            painter = painterResource(R.drawable.logo),
-                            contentDescription = "Logo",
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier
-                                .size(120.dp)
-                                .align(Alignment.Center)
-                        )
-                }
-
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "Logo",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .align(Alignment.Center)
+                )
             }
 
 
