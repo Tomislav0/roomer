@@ -3,9 +3,11 @@ package com.tomislav0.roomer.screens.rooms
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -104,15 +106,21 @@ fun RoomOverviewScreen(
                         .padding(horizontal = 10.dp, vertical = 10.dp)
                         .shadow(90.dp, shape = RoundedCornerShape(15.dp)),
                 ) {
-                    Column(modifier = Modifier
-                        .weight(1f)
-                        .padding(5.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(5.dp)
+                    ) {
                         Text(text = item.name, fontSize = 20.sp)
                         Text(text = item.description, fontSize = 12.sp)
                         Spacer(modifier = Modifier.size(10.dp))
-                        if(item.deadline.isNotEmpty()) {
+                        if (item.deadline.isNotEmpty()) {
                             Row() {
-                                Text(text = "Deadline: ${item.deadline}", fontSize = 12.sp, color = Color(0xCFFFFF00))
+                                Text(
+                                    text = "Deadline: ${item.deadline}",
+                                    fontSize = 12.sp,
+                                    color = Color(0xCFFFFF00)
+                                )
                             }
                         }
                     }
@@ -128,7 +136,7 @@ fun RoomOverviewScreen(
 
                     }
 
-                    Column() {
+                    Column(verticalArrangement = Arrangement.Bottom) {
                         Checkbox(
                             checked = item.isDone,
                             onCheckedChange = {
@@ -143,16 +151,22 @@ fun RoomOverviewScreen(
                                         .show()
                                 }
 
-                            }
+                            },
+                            modifier = Modifier.padding(top = if (item.deadline.isNotEmpty()) 17.dp else 10.dp)
                         )
+
                     }
                 }
                 Spacer(modifier = Modifier.size(10.dp))
             }
         }
-        if(tasks.isEmpty()){
-                Spacer(modifier = Modifier.size(20.dp))
-                Text(text = "This room has no active tasks.", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        if (tasks.isEmpty()) {
+            Spacer(modifier = Modifier.size(20.dp))
+            Text(
+                text = "This room has no active tasks.",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
 
         }
     }

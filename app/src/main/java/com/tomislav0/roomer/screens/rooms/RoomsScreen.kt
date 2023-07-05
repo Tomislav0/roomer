@@ -71,10 +71,13 @@ fun RoomsScreen(
         mutableStateOf<User>(User())
     }
     var rooms by remember { mutableStateOf<List<Room>>(listOf()) }
+    var shownRooms by remember { mutableStateOf<List<Room>>(listOf()) }
+
     LaunchedEffect(Unit) {
         currentUser = userViewModel.currentUser.first().first()
         viewModel.getRooms(currentUser).invokeOnCompletion {
             rooms = viewModel.rooms.value
+            shownRooms = viewModel.rooms.value
         }
 
     }
@@ -109,10 +112,16 @@ fun RoomsScreen(
                         .graphicsLayer {
                             translationY = firstItemTranslationY
                         },
-                    onSearchTextChanged = { })
+                    onSearchTextChanged = { search ->
+                        shownRooms = rooms.filter {
+                            it.name.lowercase()
+                                .contains(search.lowercase()) || it.description.lowercase()
+                                .contains(search.lowercase())
+                        }
+                    })
                 Spacer(modifier = Modifier.size(20.dp))
             }
-            itemsIndexed(rooms) { index, item ->
+            itemsIndexed(shownRooms) { index, item ->
                 Column(
                     modifier = Modifier
                         .clip(shape = RoundedCornerShape(15.dp))
@@ -138,7 +147,12 @@ fun RoomsScreen(
                                 for (it in item.members!!.map { it.initials }) {
 
                                     Spacer(modifier = Modifier.size(10.dp))
-                                    Text(text = it, fontSize = 18.sp, textAlign = TextAlign.End, modifier=Modifier.padding(top=5.dp))
+                                    Text(
+                                        text = it,
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.padding(top = 5.dp)
+                                    )
                                 }
 
                             }
@@ -146,7 +160,11 @@ fun RoomsScreen(
                     }
 
                     Spacer(modifier = Modifier.size(5.dp))
-                    Text(text = item.description, fontSize = 15.sp, modifier = Modifier.padding(start = 5.dp))
+                    Text(
+                        text = item.description,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(start = 5.dp)
+                    )
 
                     Spacer(modifier = Modifier.size(20.dp))
                     val assigned = item.tasks.filter {
@@ -190,10 +208,6 @@ fun SearchOutlinedTextField(
         },
         label = {
             Text(text = "Search")
-        },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Blue,
-            unfocusedBorderColor = Color.Gray
-        )
+        }
     )
 }

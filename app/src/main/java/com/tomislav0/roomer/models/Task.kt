@@ -5,8 +5,8 @@ import java.util.UUID.randomUUID
 
 data class Task(
     val id: String = randomUUID().toString(),
-    val roomName : String= "",
-    val roomId : String = "",
+    val roomName: String = "",
+    val roomId: String = "",
     val name: String = "",
     val description: String = "",
     val assignedTo: List<User> = listOf(),

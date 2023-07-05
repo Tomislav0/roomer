@@ -75,7 +75,11 @@ fun ForgotPasswordScreen(
                 onClick = {
                     viewModel.sendPasswordResetEmail(email).invokeOnCompletion {
                         if (viewModel.sendPasswordResetEmailResponse == Response.Success(true)) {
-                            Toast.makeText(context, "Success. Please check email.", Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                context,
+                                "Success. Please check email.",
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                             navController.navigate("login")
                         } else {

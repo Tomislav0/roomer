@@ -59,7 +59,8 @@ fun TasksScreen(
             tasks = rooms
                 .flatMap { room -> room.tasks }
                 .filter { task -> currentUser in task.assignedTo && !task.isDone }
-                .mapNotNull { task -> task.takeIf { it.assignedTo.contains(currentUser) && !it.isDone } }.sortedBy { it.deadline.isEmpty() }
+                .mapNotNull { task -> task.takeIf { it.assignedTo.contains(currentUser) && !it.isDone } }
+                .sortedBy { it.deadline.isEmpty() }
             Log.v("Debug", tasks.size.toString())
         }
 
@@ -109,9 +110,13 @@ fun TasksScreen(
                         Text(text = item.name, fontSize = 20.sp)
                         Text(text = item.description, fontSize = 12.sp)
                         Spacer(modifier = Modifier.size(10.dp))
-                        if(item.deadline.isNotEmpty()) {
+                        if (item.deadline.isNotEmpty()) {
                             Row() {
-                                Text(text = "Deadline: ${item.deadline}", fontSize = 12.sp, color = Color(0xCFFFFF00))
+                                Text(
+                                    text = "Deadline: ${item.deadline}",
+                                    fontSize = 12.sp,
+                                    color = Color(0xCFFFFF00)
+                                )
                             }
                         }
                     }

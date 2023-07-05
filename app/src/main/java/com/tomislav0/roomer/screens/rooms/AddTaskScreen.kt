@@ -123,7 +123,7 @@ fun AddTaskScreen(
 
         ) {
         Text(
-            text = if(room.name.isNotEmpty()) "${room.name} - Add Task" else "",
+            text = if (room.name.isNotEmpty()) "${room.name} - Add Task" else "",
             modifier = Modifier.padding(top = 10.dp),
             textAlign = TextAlign.Start,
             fontSize = 30.sp
@@ -134,7 +134,12 @@ fun AddTaskScreen(
             onValueChange = { name = it },
             label = { Text(text = "Task Name") },
             singleLine = true,
-            leadingIcon = { Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Task Name") },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Task Name"
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp)
@@ -145,28 +150,42 @@ fun AddTaskScreen(
             onValueChange = { description = it },
             label = { Text(text = "Task Description") },
             singleLine = true,
-            leadingIcon = { Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Task Description") },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Task Description"
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
 
 
-            OutlinedTextField(
-                value = mDate.value,
-                onValueChange = {mDate.value = it },
-                label = { Text(text = "Select deadline") },
-                singleLine = true,
-                leadingIcon = {Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Datepicker")},
-                trailingIcon = { IconButton(onClick = { mDatePickerDialog.show() },
-                    modifier = Modifier.wrapContentWidth()) {
+        OutlinedTextField(
+            value = mDate.value,
+            onValueChange = { mDate.value = it },
+            label = { Text(text = "Select deadline") },
+            singleLine = true,
+            leadingIcon = {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Datepicker"
+                )
+            },
+            trailingIcon = {
+                IconButton(
+                    onClick = { mDatePickerDialog.show() },
+                    modifier = Modifier.wrapContentWidth()
+                ) {
                     Icon(Icons.Default.DateRange, contentDescription = "Datepicker")
-                } },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(selected = true, enabled =true, role = null, onClick = {
-                        mDatePickerDialog.show()
-                    }
-                    ))
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .selectable(selected = true, enabled = true, role = null, onClick = {
+                    mDatePickerDialog.show()
+                }
+                ))
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -285,12 +304,19 @@ fun AddTaskScreen(
                     Toast.makeText(context, "Name field is required.", Toast.LENGTH_SHORT)
                         .show()
                     return@Button
-                } else if (selectedMembers.isEmpty()){
+                } else if (selectedMembers.isEmpty()) {
                     Toast.makeText(context, "Select at least one member", Toast.LENGTH_SHORT)
                         .show()
                     return@Button
                 }
-                val task = Task(roomName = room.name, roomId = room.id, name= name, description = description, assignedTo = selectedMembers, deadline = mDate.value)
+                val task = Task(
+                    roomName = room.name,
+                    roomId = room.id,
+                    name = name,
+                    description = description,
+                    assignedTo = selectedMembers,
+                    deadline = mDate.value
+                )
                 roomsViewModel
                     .createTask(
                         roomId!!, task
