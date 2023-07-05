@@ -54,7 +54,12 @@ import com.tomislav0.roomer.viewModels.UserViewModel
 
 @ExperimentalMaterial3Api
 @Composable
-fun RegistrationScreen(navController: NavController, scrollState: ScrollState, viewModel: RegisterViewModel = hiltViewModel(), userViewModel: UserViewModel = hiltViewModel()) {
+fun RegistrationScreen(
+    navController: NavController,
+    scrollState: ScrollState,
+    viewModel: RegisterViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val genders = arrayOf("Male", "Female", "Prefer not to say")
 
@@ -176,29 +181,46 @@ fun RegistrationScreen(navController: NavController, scrollState: ScrollState, v
 
             Button(
                 onClick = {
-                    if(email == "" || password == "" || repeatPassword == "" || name == "" || surname == "" || gender == "") {
-                        Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()
+                    if (email == "" || password == "" || repeatPassword == "" || name == "" || surname == "" || gender == "") {
+                        Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT)
+                            .show()
                         return@Button
-                    }else if(!EmailValidator().validate(email)){
+                    } else if (!EmailValidator().validate(email)) {
                         Toast.makeText(context, "Invalid email", Toast.LENGTH_SHORT).show()
                         return@Button
-                    } else if(password.length < 6){
-                        Toast.makeText(context, "Password must contain at least 6 characters.", Toast.LENGTH_SHORT).show()
+                    } else if (password.length < 6) {
+                        Toast.makeText(
+                            context,
+                            "Password must contain at least 6 characters.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@Button
-                    } else if(password != repeatPassword){
+                    } else if (password != repeatPassword) {
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
 
                     viewModel.signUpWithEmailAndPassword(email, password).invokeOnCompletion {
-                        if((viewModel.signUpResponse as Response.Success).data.length == 28){
-                            userViewModel.addUser(User((viewModel.signUpResponse as Response.Success).data,email,name,surname,"${name.first()}${surname.first()}",gender))
-                            Toast.makeText(context, "Success. Please login.", Toast.LENGTH_SHORT).show()
+                        if ((viewModel.signUpResponse as Response.Success).data.length == 28) {
+                            userViewModel.addUser(
+                                User(
+                                    (viewModel.signUpResponse as Response.Success).data,
+                                    email,
+                                    name,
+                                    surname,
+                                    "${name.first()}${surname.first()}",
+                                    gender
+                                )
+                            )
+                            Toast.makeText(context, "Success. Please login.", Toast.LENGTH_SHORT)
+                                .show()
                             navController.navigate("login")
-                        }else{
-                            Toast.makeText(context, "Wrong email or password.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Wrong email or password.", Toast.LENGTH_SHORT)
+                                .show()
                         }
-                }},
+                    }
+                },
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()

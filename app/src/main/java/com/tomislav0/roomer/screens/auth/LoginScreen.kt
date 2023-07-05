@@ -54,7 +54,11 @@ import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @Composable
-fun LoginScreen(navController: NavController, scrollState: ScrollState, viewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen(
+    navController: NavController,
+    scrollState: ScrollState,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val emailState = remember { mutableStateOf(TextFieldValue()) }
     val passwordState = remember { mutableStateOf(TextFieldValue()) }
     val db = Firebase.firestore
@@ -124,25 +128,30 @@ fun LoginScreen(navController: NavController, scrollState: ScrollState, viewMode
         val scope = rememberCoroutineScope()
         Button(
             onClick = {
-                viewModel.signInWithEmailAndPassword(emailState.value.text, passwordState.value.text)
+                viewModel.signInWithEmailAndPassword(
+                    emailState.value.text,
+                    passwordState.value.text
+                )
                     .invokeOnCompletion {
-                            if(viewModel.signInResponse == Response.Success(true)){
-                                Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show()
-                                val dataStore = StoreData(mContext)
+                        if (viewModel.signInResponse == Response.Success(true)) {
+                            Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show()
+                            val dataStore = StoreData(mContext)
 
-                                scope.launch {
-                                    dataStore.saveData(emailState.value.text,passwordState.value.text)
-                                }
-
-
-                                val i = Intent(mContext, ContentActivity::class.java)
-                                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                mContext.startActivity(i)
-                            }else{
-                                Toast.makeText(mContext, "Wrong email or password.", Toast.LENGTH_SHORT).show()
+                            scope.launch {
+                                dataStore.saveData(emailState.value.text, passwordState.value.text)
                             }
+
+
+                            val i = Intent(mContext, ContentActivity::class.java)
+                            i.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            mContext.startActivity(i)
+                        } else {
+                            Toast.makeText(mContext, "Wrong email or password.", Toast.LENGTH_SHORT)
+                                .show()
                         }
-                      },
+                    }
+            },
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()

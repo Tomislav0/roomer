@@ -44,6 +44,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.tomislav0.roomer.models.MenuItem
 import com.tomislav0.roomer.screens.rooms.AddTaskScreen
+import com.tomislav0.roomer.screens.rooms.ConnectionsScreen
 import com.tomislav0.roomer.screens.rooms.RoomOverviewScreen
 import com.tomislav0.roomer.screens.rooms.RoomUpsertScreen
 import com.tomislav0.roomer.screens.rooms.RoomsScreen
@@ -98,11 +99,17 @@ class ContentActivity : ComponentActivity() {
                                                     )
                                                 )
                                             }
-                                            "rooms" ->{
+
+                                            "rooms" -> {
                                                 navController.navigate("rooms")
                                             }
-                                            "tasks" ->{
+
+                                            "tasks" -> {
                                                 navController.navigate("tasks")
+                                            }
+
+                                            "connections" -> {
+                                                navController.navigate("connections")
                                             }
                                         }
                                         scope.launch {
@@ -190,6 +197,11 @@ class ContentActivity : ComponentActivity() {
                                         TasksScreen(
                                             navController,
                                         )
+                                    }
+                                    composable(
+                                        "connections"
+                                    ) {
+                                        ConnectionsScreen()
                                     }
 
                                 }

@@ -57,14 +57,14 @@ fun RoomOverviewScreen(
     LaunchedEffect(Unit) {
         roomViewModel.getRoom(roomId!!).invokeOnCompletion {
             room = roomViewModel.room.value!!
-            tasks = room.tasks.sortedBy { it.isDone }
+            tasks = room.tasks.sortedBy { it.deadline.isEmpty() }.sortedBy { it.isDone }
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 30.dp),
+            .padding(horizontal = 20.dp),
 
         ) {
         Row() {
@@ -101,7 +101,7 @@ fun RoomOverviewScreen(
                             )
                         )
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 15.dp)
+                        .padding(horizontal = 10.dp, vertical = 10.dp)
                         .shadow(90.dp, shape = RoundedCornerShape(15.dp)),
                 ) {
                     Column(modifier = Modifier
@@ -109,6 +109,12 @@ fun RoomOverviewScreen(
                         .padding(5.dp)) {
                         Text(text = item.name, fontSize = 20.sp)
                         Text(text = item.description, fontSize = 12.sp)
+                        Spacer(modifier = Modifier.size(10.dp))
+                        if(item.deadline.isNotEmpty()) {
+                            Row() {
+                                Text(text = "Deadline: ${item.deadline}", fontSize = 12.sp, color = Color(0xCFFFFF00))
+                            }
+                        }
                     }
 
                     Column(modifier = Modifier.padding(top = 8.dp)) {
@@ -119,12 +125,7 @@ fun RoomOverviewScreen(
                             }
 
                         }
-                        if(item.deadline.isEmpty()) {
-                            Row() {
-                                Text(text = "Deadline: ${item.deadline}", fontSize = 12.sp)
 
-                            }
-                        }
                     }
 
                     Column() {
@@ -146,7 +147,7 @@ fun RoomOverviewScreen(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.size(5.dp))
+                Spacer(modifier = Modifier.size(10.dp))
             }
         }
         if(tasks.isEmpty()){

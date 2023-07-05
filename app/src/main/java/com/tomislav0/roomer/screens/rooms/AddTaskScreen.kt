@@ -281,6 +281,15 @@ fun AddTaskScreen(
 
         Button(
             onClick = {
+                if (name == "") {
+                    Toast.makeText(context, "Name field is required.", Toast.LENGTH_SHORT)
+                        .show()
+                    return@Button
+                } else if (selectedMembers.isEmpty()){
+                    Toast.makeText(context, "Select at least one member", Toast.LENGTH_SHORT)
+                        .show()
+                    return@Button
+                }
                 val task = Task(roomName = room.name, roomId = room.id, name= name, description = description, assignedTo = selectedMembers, deadline = mDate.value)
                 roomsViewModel
                     .createTask(

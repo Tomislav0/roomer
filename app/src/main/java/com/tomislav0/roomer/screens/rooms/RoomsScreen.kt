@@ -46,7 +46,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -109,7 +113,7 @@ fun RoomsScreen(
                 Spacer(modifier = Modifier.size(20.dp))
             }
             itemsIndexed(rooms) { index, item ->
-                Row(
+                Column(
                     modifier = Modifier
                         .clip(shape = RoundedCornerShape(15.dp))
                         .background(
@@ -124,28 +128,36 @@ fun RoomsScreen(
                         .padding(horizontal = 10.dp, vertical = 10.dp)
                         .shadow(90.dp, shape = RoundedCornerShape(15.dp)),
                 ) {
-                    Column(modifier = Modifier.weight(1f).padding(5.dp)) {
-                        Text(text = item.name, fontSize = 30.sp)
-                        Text(text = item.description, fontSize = 18.sp)
-                        Spacer(modifier = Modifier.size(10.dp))
-                        val assigned = item.tasks.filter {
-                            it.assignedTo.contains(currentUser) && !it.isDone
-                        }
-                        Text(
-                            text = if (assigned.size != 0) if (assigned.size == 1) "${assigned.size} task assigned to you" else "${assigned.size} tasks assigned to you" else "No tasks assigned to you",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Column(modifier = Modifier.padding(top = 18.dp, end = 5.dp)) {
-                        Row(modifier = Modifier.align(Alignment.End)) {
-                            for (it in item.members!!.map { it.initials }) {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                    ) {
+                        Text(text = item.name, fontSize = 25.sp)
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(modifier = Modifier.align(Alignment.End)) {
+                                for (it in item.members!!.map { it.initials }) {
 
-                                Spacer(modifier = Modifier.size(10.dp))
-                                Text(text = it, fontSize = 18.sp, textAlign = TextAlign.End)
+                                    Spacer(modifier = Modifier.size(10.dp))
+                                    Text(text = it, fontSize = 18.sp, textAlign = TextAlign.End, modifier=Modifier.padding(top=5.dp))
+                                }
+
                             }
-
                         }
                     }
+
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Text(text = item.description, fontSize = 15.sp, modifier = Modifier.padding(start = 5.dp))
+
+                    Spacer(modifier = Modifier.size(20.dp))
+                    val assigned = item.tasks.filter {
+                        it.assignedTo.contains(currentUser) && !it.isDone
+                    }
+                    Text(
+                        text = if (assigned.size != 0) if (assigned.size == 1) "${assigned.size} task assigned to you" else "${assigned.size} tasks assigned to you" else "No tasks assigned to you",
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(start = 5.dp)
+                    )
+
                 }
                 Spacer(modifier = Modifier.size(12.dp))
             }

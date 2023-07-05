@@ -218,28 +218,37 @@ fun RoomUpsertScreen(
 
             }
         }
-            Button(
-                onClick = {
-                    selectedMembers.add(currentUser)
-                    roomsViewModel.createRoom(
-                        Room(
-                            randomUUID().toString(),
-                            name,
-                            description,
-                            selectedMembers
-                        )
-                    ).invokeOnCompletion {
-                        Toast.makeText(context, "Successful created", Toast.LENGTH_SHORT).show()
-                        navController.navigate("rooms")
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 50.dp)
+        Button(
+            onClick = {
+                if (name == "") {
+                    Toast.makeText(context, "Name field is required.", Toast.LENGTH_SHORT)
+                        .show()
+                    return@Button
+                } else if (description == "") {
+                    Toast.makeText(context, "Description field is required.", Toast.LENGTH_SHORT)
+                        .show()
+                    return@Button
+                }
+                selectedMembers.add(currentUser)
+                roomsViewModel.createRoom(
+                    Room(
+                        randomUUID().toString(),
+                        name,
+                        description,
+                        selectedMembers
+                    )
+                ).invokeOnCompletion {
+                    Toast.makeText(context, "Successful created", Toast.LENGTH_SHORT).show()
+                    navController.navigate("rooms")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 50.dp)
 
-            ) {
-                Text(text = "Create room")
-            }
+        ) {
+            Text(text = "Create room")
+        }
 
 
     }
